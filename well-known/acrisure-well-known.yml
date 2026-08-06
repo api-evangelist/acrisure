@@ -1,0 +1,120 @@
+generated: '2026-08-06'
+method: searched
+source: https://api.acrisure.com/.well-known/
+description: >-
+  Well-known discovery surface probed across every Acrisure host. api.acrisure.com is a
+  Spring Boot origin behind Cloudflare; its /.well-known/ paths are exempted from the WAF
+  rule that 403s the rest of the host, so RFC 9116 security.txt and RFC 8414 OAuth
+  authorization-server metadata are both anonymously readable there. The AI-crawler
+  surface (ai.txt) lives on the marketing host, www.acrisure.com.
+hosts:
+- host: https://api.acrisure.com
+  note: >-
+    Origin is Spring Boot (Jetty). A control probe of an invented path
+    (/.well-known/zzz-not-real-kinlane-control) returned a genuine Spring
+    NoHandlerFoundException 404, so the 200s recorded below are real documents and not a
+    soft-404 catch-all.
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    content_type: text/plain; charset=utf-8
+    file: acrisure-security.txt
+    spec: RFC 9116
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    content_type: application/json
+    file: acrisure-oauth-authorization-server.json
+    spec: RFC 8414
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+    note: >-
+      Absent. The MCP endpoint at /v1/mcp is therefore not discoverable via RFC 9728
+      protected-resource metadata; the authorization server had to be found by probing
+      /.well-known/oauth-authorization-server directly.
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: https://www.acrisure.com
+  note: >-
+    Sitecore XM Cloud / Next.js marketing site. Returns a 404 with an HTML error body for
+    unknown /.well-known/ paths, so the 200 below is a real document.
+  documents:
+  - path: /.well-known/ai.txt
+    status: 200
+    content_type: text/plain; charset=utf-8
+    file: acrisure-ai.txt
+    spec: ai.txt (de facto AI-crawler permissions convention)
+  - path: /.well-known/security.txt
+    status: 200
+    content_type: text/plain
+    note: Canonical location declared by the security.txt served on all hosts.
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: https://customer.acrisure.com
+  note: >-
+    Customer portal SPA in front of a Spring Boot service. Answers RFC 9457
+    application/problem+json for unmatched API paths.
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    content_type: text/plain
+    note: Identical body to the api host; canonical points at www.acrisure.com.
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+ai_crawler_surface:
+  source: https://www.acrisure.com/.well-known/ai.txt
+  file: acrisure-ai.txt
+  posture: allow-all
+  bots_explicitly_allowed:
+  - GPTBot
+  - Claude-Web
+  - Anthropic-AI
+  - Google-Extended
+  - CCBot
+  - PerplexityBot
+  disallowed_paths:
+  - /api/editing/
+  - /sitecore/
+  declared_ai_endpoints:
+  - url: https://www.acrisure.com/ai/summary.json
+    status: 200
+  - url: https://www.acrisure.com/ai/faq.json
+    status: 200
+  - url: https://www.acrisure.com/ai/service.json
+    status: 200
+  - url: https://www.acrisure.com/ai/markdown
+    status: 404
+  declared_sitemaps:
+  - url: https://www.acrisure.com/sitemap-llm.xml
+    status: 200
+  - url: https://www.acrisure.com/sitemap.xml
+    status: 200
+  x-defect: >-
+    ai.txt itself is correctly configured for acrisure.com, but every AI endpoint it
+    advertises still serves the unshipped Sitecore XM Cloud starter-kit demo content
+    ("Skate Park", a fictional skate-brand wholesaler with a placeholder address and phone
+    number) rather than anything about Acrisure. See conformance/acrisure-conformance.yml
+    for the graded record and the evidence URLs.
+x-evidence:
+  fetched: '2026-08-06'
+  control_probe:
+    url: https://api.acrisure.com/.well-known/zzz-not-real-kinlane-control
+    http_status: 404
+    body: Spring NoHandlerFoundException — confirms 200s above are not soft-404s

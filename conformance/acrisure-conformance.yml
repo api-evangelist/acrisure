@@ -1,0 +1,175 @@
+generated: '2026-08-06'
+method: probed
+source: probes of api.acrisure.com, www.acrisure.com, customer.acrisure.com
+description: >-
+  Cross-cutting standards conformance for Acrisure, asserted only from documents we
+  actually fetched. Acrisure publishes no OpenAPI, AsyncAPI, GraphQL SDL, or developer
+  documentation, so every entry below is grounded in a probed discovery document or an
+  observed response, never in marketing copy.
+standards:
+- id: rfc9116-security-txt
+  conforms: true
+  evidence: >-
+    https://api.acrisure.com/.well-known/security.txt returns 200 text/plain with
+    Canonical, Contact, Expires, Hiring and Preferred-Languages fields. Expires is
+    2027-01-16, i.e. still valid. Served identically on api., www. and customer. hosts.
+  file: well-known/acrisure-security.txt
+- id: rfc8414-oauth-authorization-server-metadata
+  conforms: true
+  evidence: >-
+    https://api.acrisure.com/.well-known/oauth-authorization-server returns 200
+    application/json with issuer, authorization_endpoint, token_endpoint, jwks_uri,
+    scopes_supported, response_types_supported, grant_types_supported,
+    token_endpoint_auth_methods_supported and code_challenge_methods_supported.
+  file: well-known/acrisure-oauth-authorization-server.json
+- id: oauth2
+  conforms: true
+  evidence: >-
+    Authorization-code grant with refresh_token, client_secret_post/client_secret_basic
+    client authentication, advertised by the RFC 8414 metadata.
+- id: rfc7636-pkce
+  conforms: true
+  evidence: 'code_challenge_methods_supported: ["S256"] in the authorization-server metadata.'
+- id: rfc9728-oauth-protected-resource-metadata
+  conforms: false
+  evidence: >-
+    /.well-known/oauth-protected-resource returns 404 on api.acrisure.com,
+    www.acrisure.com and customer.acrisure.com. An MCP client following the specified
+    discovery chain from the resource URL cannot find the authorization server.
+- id: openid-connect-discovery
+  conforms: false
+  evidence: /.well-known/openid-configuration returns 404 on api.acrisure.com.
+- id: mcp
+  conforms: partial
+  evidence: >-
+    A hosted MCP server is live and OAuth-protected at https://api.acrisure.com/v1/mcp
+    (POST tools/list returns an application-level 403; the control path /v1/mcpZZZ returns
+    a Spring 404). It is undocumented and its protected-resource metadata is missing, so
+    the transport exists but the discovery contract the spec expects does not.
+  artifact: mcp/acrisure-mcp.yml
+- id: rfc9457-problem-details
+  conforms: partial
+  evidence: >-
+    customer.acrisure.com emits application/problem+json for unmatched API paths (e.g.
+    /.well-known/agent-card.json -> 404 {"type":"about:blank","title":"Not Found"}).
+    api.acrisure.com does NOT — it returns a Spring default error object with a full Java
+    stack trace in a `trace` field.
+- id: openapi
+  conforms: false
+  evidence: >-
+    No OpenAPI at any probed location on any host. api.acrisure.com root paths are 403ed
+    by a Cloudflare WAF rule; /v1/openapi.json, /v1/swagger.json and /v1/v3/api-docs reach
+    the origin and return Spring 404s. customer.acrisure.com answers every unknown path
+    with the SPA HTML shell, and its Spring Boot actuator exposes only `health`.
+- id: asyncapi
+  conforms: false
+  evidence: No event, streaming, or webhook surface is published or documented.
+- id: graphql
+  conforms: false
+  evidence: >-
+    POST introspection to api.acrisure.com/v1/graphql returns a Spring 404;
+    customer.acrisure.com/graphql returns 405 Method Not Allowed for POST.
+- id: a2a-agent-card
+  conforms: false
+  evidence: >-
+    /.well-known/agent-card.json and /.well-known/agent.json return 404 on all four probed
+    hosts (www., apex, api., customer.). No agent card is published.
+- id: llms-txt
+  conforms: false
+  evidence: >-
+    https://www.acrisure.com/llms.txt returns 200 text/markdown, but the body is the
+    unshipped Sitecore XM Cloud starter-kit demo document — titled "Skate Park Demo Site",
+    describing a Sitecore component showcase, with every link pointing at
+    https://localhost:3000/. It contains nothing about Acrisure and no reachable URL.
+  file: llms/acrisure-llms.txt
+  severity: high
+x-defects:
+- id: sitecore-demo-content-served-to-agents
+  severity: high
+  summary: >-
+    Acrisure's entire agent-facing content layer is the unshipped Sitecore XM Cloud
+    starter-kit demo. The endpoints are wired correctly and return 200, but the content
+    describes "Skate Park", a fictional skate-brand wholesaler, rather than Acrisure.
+  detail: >-
+    /.well-known/ai.txt is correctly configured for acrisure.com and advertises three AI
+    endpoints plus an LLM sitemap. All three endpoints resolve, and all three serve demo
+    fixtures. ai/summary.json describes "a simple demo site showcasing component examples
+    for Sitecore XM Cloud". ai/service.json lists eight services that are Sitecore
+    development features ("Starter Kit Scaffolding", "Component Showcase"), not Acrisure's
+    insurance, benefits, payroll, cyber or mortgage lines. ai/faq.json answers six
+    questions about Skate Park and publishes a placeholder contact block
+    (info@Skatepark.com, 234-234-234-234, "12 Forever Street, A99 B44, The Nation of
+    Skate"). robots.txt is headed "# Robots.txt for https://localhost:3000". The homepage
+    og:image is "http://localhost:3000/[object%20Object]". The lastModified timestamps in
+    the JSON responses are generated at request time (observed 2026-08-06T13:50:15Z), so
+    these are actively served by the live application, not stale cached files.
+  impact: >-
+    Any AI crawler or agent that follows Acrisure's own published discovery chain — ai.txt
+    to the AI endpoints, or llms.txt — is told that acrisure.com is a skate-apparel
+    wholesaler. Acrisure explicitly allows GPTBot, Claude-Web, Anthropic-AI,
+    Google-Extended, CCBot and PerplexityBot, so this is the description they have invited
+    those crawlers to take.
+  remedy: >-
+    Populate the XM Cloud AI-endpoint templates with Acrisure content, or unroute them.
+    Regenerate llms.txt and robots.txt against the production host so no localhost:3000
+    URL survives, and fix the homepage og:image binding.
+  evidence:
+  - url: https://www.acrisure.com/llms.txt
+    status: 200
+    finding: '# Skate Park Demo Site — all links https://localhost:3000/'
+  - url: https://www.acrisure.com/ai/summary.json
+    status: 200
+    finding: '{"title":"Skate Park","description":"...demo site showcasing component examples for Sitecore XM Cloud..."}'
+  - url: https://www.acrisure.com/ai/faq.json
+    status: 200
+    finding: Six Q&A pairs about Skate Park; placeholder contact info@Skatepark.com / 234-234-234-234
+  - url: https://www.acrisure.com/ai/service.json
+    status: 200
+    finding: Eight "services" that are Sitecore XM Cloud development features
+  - url: https://www.acrisure.com/robots.txt
+    status: 200
+    finding: 'Header reads "# Robots.txt for https://localhost:3000"'
+  - url: https://www.acrisure.com/.well-known/ai.txt
+    status: 200
+    finding: Correctly configured for www.acrisure.com — the one file in the set that is right
+- id: undocumented-production-mcp-server
+  severity: medium
+  summary: >-
+    A production MCP server is live at https://api.acrisure.com/v1/mcp with no
+    documentation, no protected-resource metadata, and no public mention anywhere.
+  detail: >-
+    The only anonymous trace of it is the `mcp_user` scope in the authorization-server
+    metadata. RFC 9728 protected-resource metadata is absent, so a conforming MCP client
+    cannot discover the authorization server from the resource URL.
+  evidence:
+  - url: https://api.acrisure.com/v1/mcp
+    status: 403
+  - url: https://api.acrisure.com/.well-known/oauth-protected-resource
+    status: 404
+- id: stack-traces-in-error-responses
+  severity: medium
+  summary: >-
+    api.acrisure.com returns full Java stack traces to unauthenticated clients in its 404
+    bodies.
+  detail: >-
+    A GET of any unrouted path returns a ~15KB JSON body whose `trace` field contains the
+    complete Spring/Jetty filter chain, disclosing framework and version detail
+    (Spring Security, Jetty ee10, Java 21) to anonymous callers.
+  evidence:
+  - url: https://api.acrisure.com/.well-known/zzz-not-real-kinlane-control
+    status: 404
+    finding: 15083-byte body containing org.springframework.web.servlet.NoHandlerFoundException stack trace
+compliance_program:
+  published: false
+  note: >-
+    No trust center, compliance page, or named certification (SOC 2, ISO 27001, PCI DSS,
+    HIPAA) is published on any Acrisure host. trust.acrisure.com returns 403;
+    /trust, /security and /compliance return 404 on www.acrisure.com. No `Compliance`
+    pointer is emitted, because none is earned.
+x-evidence:
+  fetched: '2026-08-06'
+  hosts_probed:
+  - https://api.acrisure.com
+  - https://www.acrisure.com
+  - https://acrisure.com
+  - https://customer.acrisure.com

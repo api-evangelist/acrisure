@@ -1,0 +1,35 @@
+# AI Crawler Permissions for https://www.acrisure.com
+
+User-Agent: *
+Allow: /
+
+User-Agent: GPTBot
+Allow: /
+
+User-Agent: Claude-Web
+Allow: /
+
+User-Agent: Anthropic-AI
+Allow: /
+
+User-Agent: Google-Extended
+Allow: /
+
+User-Agent: CCBot
+Allow: /
+
+User-Agent: PerplexityBot
+Allow: /
+
+Disallow: /api/editing/
+Disallow: /sitecore/
+
+AI-Endpoint: https://www.acrisure.com/ai/summary.json
+AI-Endpoint: https://www.acrisure.com/ai/faq.json
+AI-Endpoint: https://www.acrisure.com/ai/service.json
+AI-Endpoint: https://www.acrisure.com/ai/markdown
+
+Sitemap: https://www.acrisure.com/sitemap-llm.xml
+Sitemap: https://www.acrisure.com/sitemap.xml
+
+Last-Modified: 2026-08-06

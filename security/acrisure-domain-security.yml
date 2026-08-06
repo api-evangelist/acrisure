@@ -1,0 +1,60 @@
+generated: '2026-08-06'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + discovered API hosts
+hosts:
+- host: www.acrisure.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Sep 24 04:19:52 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
+- host: api.acrisure.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Sep 24 04:19:52 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
+  hsts_include_subdomains: true
+  note: >-
+    Observed on GET /.well-known/security.txt (200). The automated probe recorded null
+    because this host's root is answered by a Cloudflare WAF block; the header is present
+    on both the block page and on origin responses.
+- host: customer.acrisure.com
+  https: true
+  tls_version: TLSv1.3
+  hsts: true
+  hsts_max_age: 31536000
+  hsts_include_subdomains: true
+  note: >-
+    Customer portal SPA in front of a Spring Boot service. Added manually — it was not in
+    apis.yml when the automated probe ran.
+domains:
+- domain: acrisure.com
+  dnssec: true
+  caa: []
+  caa_note: No CAA record is published, so any public CA may issue for this domain.
+  spf: true
+  dmarc: true
+  dmarc_policy: quarantine
+  dmarc_subdomain_policy: quarantine
+  dmarc_alignment: strict (adkim=s, aspf=s)
+  dmarc_pct: 100
+  dmarc_reporting: >-
+    Aggregate reports to Cloudflare, security@acrisure.com and EasyDMARC; forensic reports
+    to EasyDMARC.
+  dmarc_note: >-
+    p=quarantine rather than p=reject, so spoofed mail is junked rather than rejected
+    outright.
+x-evidence:
+  fetched: '2026-08-06'
+  probes:
+  - url: https://api.acrisure.com/.well-known/security.txt
+    http_status: 200
+    header: 'strict-transport-security: max-age=31536000; includeSubDomains'
+  - url: https://customer.acrisure.com/.well-known/security.txt
+    http_status: 200
+    header: 'strict-transport-security: max-age=31536000; includeSubDomains'
+  - query: CAA acrisure.com
+    result: empty
+  - query: TXT _dmarc.acrisure.com
+    result: 'v=DMARC1; p=quarantine; sp=quarantine; adkim=s; aspf=s; pct=100'

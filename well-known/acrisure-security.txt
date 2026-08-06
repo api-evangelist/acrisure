@@ -1,0 +1,5 @@
+Canonical: https://www.acrisure.com/.well-known/security.txt
+Contact: mailto:security@acrisure.com
+Expires: 2027-01-16T12:00:00Z
+Hiring: https://acrisure.wd1.myworkdayjobs.com/Acrisure
+Preferred-Languages: en

@@ -1,0 +1,78 @@
+generated: '2026-08-06'
+method: probed
+status: published
+source: https://api.acrisure.com/.well-known/oauth-authorization-server
+description: >-
+  Acrisure operates a hosted, production Model Context Protocol server at
+  https://api.acrisure.com/v1/mcp, protected by Microsoft Entra ID. It is not announced in
+  any Acrisure documentation, press release, or developer portal — it was found by probing
+  the API host's RFC 8414 authorization-server metadata, which advertises a single
+  application scope named `mcp_user`. The endpoint is real and auth-gated: `tools/list`
+  returns an application-level 403, while every sibling path under /v1/ returns a Spring
+  `NoHandlerFoundException` 404.
+server:
+  name: acrisure
+  transport: http
+  url: https://api.acrisure.com/v1/mcp
+  gated: true
+  auth:
+    type: oauth2
+    provider: Microsoft Entra ID
+    tenant_id: c2ec94c0-ebd0-4630-aef2-2dcf0eb68ebd
+    issuer: https://api.acrisure.com
+    authorization_endpoint: https://api.acrisure.com/oauth/authorize
+    token_endpoint: https://api.acrisure.com/oauth/token
+    jwks_uri: https://login.microsoftonline.com/c2ec94c0-ebd0-4630-aef2-2dcf0eb68ebd/discovery/v2.0/keys
+    grant_types:
+    - authorization_code
+    - refresh_token
+    pkce: S256
+    scopes:
+    - api://bc250bc0-7689-4f21-b164-72a6b57c273b/mcp_user
+    - offline_access
+    scopes_artifact: scopes/acrisure-scopes.yml
+tools: []
+tools_note: >-
+  NOT RECORDED — the live tool set is auth-gated and Acrisure publishes no llms.txt tool
+  list, no OpenAPI, and no MCP documentation, so there is no honest source for tool names
+  or input schemas. Enumerating them would require an authenticated `tools/list` against a
+  token issued by Acrisure's Entra tenant. No tools are guessed or derived here.
+discovery:
+  x-defect: >-
+    RFC 9728 OAuth protected-resource metadata is absent
+    (/.well-known/oauth-protected-resource returns 404 on every host), so a spec-compliant
+    MCP client cannot discover the authorization server from the resource URL. Only a
+    direct probe of /.well-known/oauth-authorization-server reveals it.
+  oauth_protected_resource:
+    url: https://api.acrisure.com/.well-known/oauth-protected-resource
+    http_status: 404
+  oauth_authorization_server:
+    url: https://api.acrisure.com/.well-known/oauth-authorization-server
+    http_status: 200
+x-evidence:
+  fetched: '2026-08-06'
+  probes:
+  - url: https://api.acrisure.com/v1/mcp
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+    http_status: 403
+    content_type: application/json
+    response: '{"status":403,"error":"Forbidden","message":"Forbidden","path":"/v1/mcp"}'
+    origin: >-
+      Spring Security (via 1.1 google) — an application-level authorization denial, NOT the
+      Cloudflare WAF HTML block that answers /mcp and other root paths on this host.
+  - url: https://api.acrisure.com/v1/mcpZZZ
+    method: POST
+    http_status: 404
+    response: Spring NoHandlerFoundException — 'No endpoint POST /v1/mcpZZZ.'
+    note: >-
+      CONTROL. Proves /v1/mcp is a routed handler rather than a catch-all. A non-existent
+      sibling 404s; /v1/mcp 403s.
+  - url: https://api.acrisure.com/.well-known/oauth-authorization-server
+    http_status: 200
+    content_type: application/json
+    note: Advertises the `mcp_user` scope that names this server.
+  - url: https://api.acrisure.com/oauth/authorize
+    http_status: 302
+    location: https://login.microsoftonline.com/c2ec94c0-ebd0-4630-aef2-2dcf0eb68ebd/oauth2/v2.0/authorize
+    note: Confirms Microsoft Entra ID as the identity provider behind the server.

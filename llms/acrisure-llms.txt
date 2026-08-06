@@ -1,0 +1,20 @@
+# Skate Park Demo Site
+
+> A demo site showcasing Sitecore XM Cloud component examples, patterns, and Next.js integration for developers and content authors.
+
+This site demonstrates reusable components, layout variants, and content authoring workflows. It includes an About section and serves as a reference for building XM Cloud front-end applications.
+
+## Key pages
+
+- [Home](https://localhost:3000/): Demo landing and component overview
+- [About](https://localhost:3000/About): Site and component library overview
+
+## Optional
+
+- [Sitemap](https://localhost:3000/sitemap.xml): Full XML sitemap for search engines
+- [LLM Sitemap](https://localhost:3000/sitemap-llm.xml): LLM-optimized sitemap for AI crawlers
+- [Robots](https://localhost:3000/robots.txt): Crawler and bot access rules
+- [AI metadata](https://localhost:3000/.well-known/ai.txt): AI crawler and LLM metadata (ai.txt)
+- [FAQ (JSON)](https://localhost:3000/ai/faq.json): Frequently asked questions
+- [Summary (JSON)](https://localhost:3000/ai/summary.json): Site summary for AI consumption
+- [Service (JSON)](https://localhost:3000/ai/service.json): Service information for AI consumption
