@@ -19,6 +19,19 @@ specificationVersion: '0.23'
 created: '2026-08-06'
 modified: '2026-08-06'
 tags:
+- Insurance
+- Insurance Brokerage
+- Fintech
+- Employee Benefits
+- payroll-hr
+- Reinsurance
+- Risk Management
+- Cybersecurity
+- Mortgage
+- Surety Bonds
+- MCP
+- Authentication
+tags_raw:
 - insurance
 - insurance-brokerage
 - fintech
@@ -44,6 +57,11 @@ apis:
   humanURL: https://www.acrisure.com/
   baseURL: https://api.acrisure.com/v1/mcp
   tags:
+  - MCP
+  - Authentication
+  - Fintech
+  - Insurance
+  tags_raw:
   - mcp
   - oauth2
   - fintech
