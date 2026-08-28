@@ -11,6 +11,17 @@ description: >-
   OAuth-protected Model Context Protocol server at api.acrisure.com/v1/mcp behind
   Microsoft Entra ID — discoverable only from the `mcp_user` scope in its RFC 8414
   authorization-server metadata.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://edge.sitecorecloud.io/acrisurellc1-acrisure-prod-0dbe/media/Project/Acrisure/Acrisure-Site/Master-Site/Acrisure-Logo/acrisure-logo-large.png
 url: https://raw.githubusercontent.com/api-evangelist/acrisure/refs/heads/main/apis.yml
 x-type: company
