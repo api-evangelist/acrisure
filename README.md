@@ -66,7 +66,7 @@
 
 Acrisure is a global fintech and insurance brokerage headquartered in Grand Rapids, Michigan, founded in 2005 and grown from $38M to roughly $5B in revenue with more than 19,000 colleagues across 500+ offices in over 20 countries. It sells commercial and personal insurance, employee benefits, payroll and HR, reinsurance, surety bonds, trade credit, mortgages, managed IT and cybersecurity through a partner-agency model rather than a developer platform. Acrisure publishes no developer portal, no API reference and no machine-readable specification of any kind, but it does operate an undocumented, OAuth-protected Model Context Protocol server at api.acrisure.com/v1/mcp behind Microsoft Entra ID — discoverable only from the `mcp_user` scope in its RFC 8414 authorization-server metadata.
 
-**Areas:** Insurance · Insurance Brokerage · Fintech · Employee Benefits · payroll-hr · Reinsurance · Risk Management · Cybersecurity · Mortgage · Surety · MCP · Authentication
+**Areas:** Insurance · Insurance Brokerage · Fintech · Employee Benefits · Payroll HR · Reinsurance · Risk Management · Cybersecurity · Mortgage · Surety · MCP · OAuth
 
 ## Acrisure on APIs.io
 
@@ -114,18 +114,18 @@ Links to the company's own pages. This repository publishes no copy of their spe
 
 ## API Evangelist rating
 
-**Kin Score 22.3** — emerging · rubric 0.25.0 · scored 2026-10-23
+**Kin Score 23.6** — emerging · rubric 0.28.1 · scored 2026-11-21
 
 | Facet | Score |
 |---|---|
-| Discoverability | 75.8 |
+| Discoverability | 76.7 |
 | Contract quality | 0.0 |
 | Contract governance | 18.2 |
-| Operational transparency | 5.3 |
+| Operational transparency | 4.8 |
 | Developer ergonomics | 19.0 |
-| Access clarity | 21.1 |
+| Access clarity | 27.7 |
 
-**Agent readiness 14.2** — agent-aware
+**Agent readiness 13.9** — agent-aware
 
 | Agent-readiness dimension | Result |
 |---|---|
@@ -150,6 +150,10 @@ Links to the company's own pages. This repository publishes no copy of their spe
 | Agentic Commerce | — |
 | Pagination Ratio | na |
 | Operation Distinctiveness | na |
+| MCP Tool Quality | na |
+| Onboarding Descriptor | — |
+| Dns Aid Index | na |
+| Markdown Negotiation | na |
 
 **Regulatory alignment 42.1** — Insurance
 
